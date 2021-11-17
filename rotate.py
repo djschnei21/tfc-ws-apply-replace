@@ -8,3 +8,7 @@ TFC_URL = "https://app.terraform.io"
 
 api = TFC(TFC_TOKEN, url=TFC_URL)
 api.set_org(TFC_ORG)
+
+all_ws = self._api.workspaces.list_all(include=["organization"])
+
+print(all_ws)
