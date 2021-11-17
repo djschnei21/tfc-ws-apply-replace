@@ -9,6 +9,6 @@ TFC_URL = "https://app.terraform.io"
 api = TFC(TFC_TOKEN, url=TFC_URL)
 api.set_org(TFC_ORG)
 
-all_ws = api.workspaces.list_all(include=[TFC_ORG])
+all_ws = api.workspaces.list_all()
 
 print(all_ws)
