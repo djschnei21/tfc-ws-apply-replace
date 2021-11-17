@@ -20,6 +20,6 @@ found_ws = []
 
 for i in api.workspaces.list()['data']:
     if i['attributes']['name'].startswith(TFC_WS_FILTER):
-        found_ws.append(i)
+        found_ws.append(i['attributes']['name'])
 
 print(found_ws)
