@@ -13,13 +13,13 @@ with open("payload.json", "r") as read_file:
 api = TFC(TFC_TOKEN, url=TFC_URL)
 api.set_org(TFC_ORG)
 
+# TODO: implement downstream workspace locking to avoid breakage mid rotation (very unlikely, but possible)
 def workspace_lock (org, ws):
     api.set_org(org)
     ws_locked = api.workspaces.lock(
         ws, {"reason": "Key Rotation."})["data"]
     print(ws_locked)
     return
-
 
 for ws in api.workspaces.list()['data']:
     creds_to_rotate = []
