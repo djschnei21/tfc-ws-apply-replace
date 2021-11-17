@@ -3,6 +3,7 @@ from terrasnek.api import TFC
 
 TFC_TOKEN = os.getenv("TFC_TOKEN", None)
 TFC_ORG = os.getenv("TFC_ORG", None)
+TFC_WS_FILTER = os.getenv("TFC_WS_FILTER", None)
 TFC_URL = "https://app.terraform.io"
 
 print("----------------")
@@ -15,6 +16,10 @@ print("----------------")
 api = TFC(TFC_TOKEN, url=TFC_URL)
 api.set_org(TFC_ORG)
 
-all_ws = api.workspaces.list()
+found_ws = []
 
-print(all_ws)
+for i in api.workspaces.list()['data']:
+    if i['attributes']['name'].startswith(TFC_WS_FILTER):
+        found_ws.append(i)
+
+print(found_ws)
