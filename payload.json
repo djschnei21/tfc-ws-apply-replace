@@ -1,0 +1,18 @@
+{
+    "data": {
+      "attributes": {
+        "message": "API Triggered Key Rotation",
+        "replace-addrs": [],
+        "auto-apply": true
+      },
+      "type":"runs",
+      "relationships": {
+        "workspace": {
+          "data": {
+            "type": "workspaces",
+            "id": ""
+          }
+        }
+      }
+    }
+  }
