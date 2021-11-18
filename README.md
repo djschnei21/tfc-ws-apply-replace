@@ -27,8 +27,23 @@ resource "aws_iam_user_policy_attachment" "iam_user_policy_attach" {
 resource "aws_iam_access_key" "workspace_creds" {
   user = aws_iam_user.iam_user.name
 }
+
+resource "tfe_variable" "aws_access_key_id" {
+  key          = "AWS_ACCESS_KEY_ID"
+  category     = "env"
+  value        = aws_iam_access_key.workspace_creds.id
+  workspace_id = tfe_workspace.workspace.id
+}
+
+resource "tfe_variable" "aws_secret_access_key" {
+  key          = "AWS_SECRET_ACCESS_KEY"
+  category     = "env"
+  sensitive    = true
+  value        = aws_iam_access_key.workspace_creds.secret
+  workspace_id = tfe_workspace.workspace.id
+}
 ```
-If I wanted to replace/rotate the resource `aws_iam_access_key`, I would use the resources given name `workspace_creds`
+If I wanted to replace/rotate the resource `aws_iam_access_key` (and by relation any resource that depends on it, i.e. the `tfe_variable`s), I would use the resources given name `workspace_creds`
 
 ```
 python3 rotate.py some-org ws-xxxxxxxxxxxxxxxx workspace_creds
