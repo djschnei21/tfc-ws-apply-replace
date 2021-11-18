@@ -1,43 +1,77 @@
 import os
+import sys
 import json
+import time
 from terrasnek.api import TFC
 
-TFC_TOKEN = os.getenv("TFC_TOKEN", None)
-TFC_ORG = os.getenv("TFC_ORG", None)
-TFC_URL = "https://app.terraform.io"
-TFC_WS = os.getenv("TFC_WS_FILTER", None)
+tfc_url = "https://app.terraform.io"
+api_token = os.getenv("TFC_TOKEN")
+
+if api_token == None:
+    print("\nPlease set TFC_TOKEN as an environment variable equal to a valid TFC token")
+    sys.exit(1)
+
+org_name = sys.argv[1]
+ws_id = sys.argv[2]
+resource_name_keyword = sys.argv[3]
 
 with open("payload.json", "r") as read_file:
     payload_tpl = json.load(read_file)
 
-api = TFC(TFC_TOKEN, url=TFC_URL)
-api.set_org(TFC_ORG)
+api = TFC(api_token, url=tfc_url)
 
-# TODO: implement downstream workspace locking to avoid breakage mid rotation (very unlikely, but possible)
-def workspace_lock (org, ws):
-    api.set_org(org)
-    ws_locked = api.workspaces.lock(
-        ws, {"reason": "Key Rotation."})["data"]
-    print(ws_locked)
-    return
+api.set_org(org_name)
 
-for ws in api.workspaces.list()['data']:
-    creds_to_rotate = []
-    
-    ws_name = ws['attributes']['name']
-    ws_id = ws['id']
-    
-    if ws_name == TFC_WS:
-        state = api.state_versions.get_current(ws['id'])
-        payload = payload_tpl
-        for r in state['data']['attributes']['resources']:
-            if r['name'] == 'workspace_creds':
+def workspace_name (ws_id):
+    name = api.workspaces.list(ws_id)['data'][0]['attributes']['name']
+    return name
+
+def find_resources (ws_id, resource_name_keyword):
+    resource_to_replace = list()
+    state = api.state_versions.get_current(ws_id)
+    for r in state['data']['attributes']['resources']:
+        if r['name'].startswith(resource_name_keyword):
+            if r['module'] == 'root':
+                addr = r['type'] + '.' + r['name']
+            else:
                 addr = r['module'].replace('root', 'module') + '.' + r['type'] + '.' + r['name']
-                creds_to_rotate.append(addr)
-        if len(creds_to_rotate) > 0:
-            #workspace_lock(org_name, child_ws_id)
-            payload['data']['attributes']['replace-addrs'] = creds_to_rotate
-            payload['data']['relationships']['workspace']['data']['id'] = ws_id
-            print(json.dumps(payload, indent=4, sort_keys=True))
-            api.runs.create(payload)
+            resource_to_replace.append(addr)
+    return resource_to_replace
 
+def replace (ws_id, resources, payload):
+    payload['data']['attributes']['replace-addrs'] = resources
+    payload['data']['relationships']['workspace']['data']['id'] = ws_id
+    resp = api.runs.create(payload)['data']['id']
+    return resp
+
+def run_status (run_id):
+    status = api.runs.show(run_id)['data']['attributes']['status']
+    return status
+
+print("-------------------------------------")
+print("TFC Organization Name: " + org_name)
+print("TFC Workspace ID: " + ws_id)
+print("Resource Name FIlter: " + resource_name_keyword)
+print("-------------------------------------\n")
+
+ws_name = workspace_name(ws_id)
+resources = find_resources(ws_id, resource_name_keyword)
+if len(resources) > 0:
+    print("Found " + str(len(resources)) + " resources whose name(s) contain the keyword!:\n")
+    for r in resources:
+        print("    " + r)
+    run_id = replace(ws_id, resources, payload_tpl)
+    status1 = run_status(run_id)
+    status2 = status1
+    print("\nTriggering a \'terraform apply -replace=" + str(resources) + "\' to rotate the found resources...")
+    print("\nLink to run: " + tfc_url + "/app/" + org_name + "/workspaces/" + ws_name + "/runs/" + run_id)
+    print("\nTFC Run Status: " + status1 + "...")
+    while status1 != "applied" and status1 != "errored":
+        time.sleep(1)
+        status2 = run_status(run_id)
+        if status1 != status2:
+            print("TFC Run Status: " + status2 + "...")
+            status1 = status2
+    if status1 == "errored":
+        print("Looks like something went wrong... Please see logs above.")
+        sys.exit(1)
