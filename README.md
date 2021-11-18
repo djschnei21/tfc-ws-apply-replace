@@ -30,6 +30,29 @@ resource "aws_iam_access_key" "workspace_creds" {
 ```
 If I wanted to replace/rotate the resource `aws_iam_access_key`, I would use the resources given name `workspace_creds`
 
-`python3 rotate.py some-org ws-xxxxxxxxxxxxxxxx workspace_creds`
+```
+python3 rotate.py some-org ws-xxxxxxxxxxxxxxxx workspace_creds
+-------------------------------------
+TFC Organization Name: some-org
+TFC Workspace ID: ws-xxxxxxxxxxxxxxxx
+Resource Name FIlter: workspace_creds
+-------------------------------------
 
+Found 3 resources whose name(s) start with the keyword!:
+
+    module.ws_vending_machine["djs-ec2"].aws_iam_access_key.workspace_creds
+    module.ws_vending_machine["djs-iam"].aws_iam_access_key.workspace_creds
+    module.ws_vending_machine["djs-s3"].aws_iam_access_key.workspace_creds
+
+Triggering a 'terraform apply -replace=' to rotate the found resources...
+
+Link to run: https://app.terraform.io/app/some-org/workspaces/some-workspace/runs/run-xxxxxxxxxxxxxxxx
+
+Status: pending...
+Status: plan_queued...
+Status: planning...
+Status: cost_estimating...
+Status: applying...
+Status: applied...
+```
 This script can be scheduled to rotate the credentials limiting the risk of bad terraform code leaking the sensitive variables.
