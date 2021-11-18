@@ -33,6 +33,6 @@ resource "aws_iam_access_key" "workspace_creds" {
 ```
 If I wanted to replace/rotate the resource `aws_iam_access_key`, I would use the resources given name `workspace_creds`
 
-`python3 rotate.py djs-admin ws-Zh2kBGmXrh5hgBxA workspace_creds`
+`python3 rotate.py some-org ws-xxxxxxxxxxxxxxxx workspace_creds`
 
 This script can be scheduled to rotate the credentials limiting the risk of bad terraform code leaking the sensitive variables.
