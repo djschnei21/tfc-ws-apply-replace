@@ -65,12 +65,12 @@ if len(resources) > 0:
     status2 = status1
     print("\nTriggering a \'terraform apply -replace=" + str(resources) + "\' to rotate the found resources...")
     print("\nLink to run: " + tfc_url + "/app/" + org_name + "/workspaces/" + ws_name + "/runs/" + run_id)
-    print("\nTFC Run Status: " + status1 + "...")
+    print("\nStatus: " + status1 + "...")
     while status1 != "applied" and status1 != "errored":
         time.sleep(1)
         status2 = run_status(run_id)
         if status1 != status2:
-            print("TFC Run Status: " + status2 + "...")
+            print("Status: " + status2 + "...")
             status1 = status2
     if status1 == "errored":
         print("Looks like something went wrong... Please see logs above.")
