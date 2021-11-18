@@ -57,7 +57,7 @@ print("-------------------------------------\n")
 ws_name = workspace_name(ws_id)
 resources = find_resources(ws_id, resource_name_keyword)
 if len(resources) > 0:
-    print("Found " + str(len(resources)) + " resources whose name(s) start with the keyword!:\n")
+    print("Found " + str(len(resources)) + " resources whose name(s) start with the keyword:\n")
     for r in resources:
         print("    " + r)
     run_id = replace(ws_id, resources, payload_tpl)

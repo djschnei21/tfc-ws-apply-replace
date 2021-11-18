@@ -38,7 +38,7 @@ TFC Workspace ID: ws-xxxxxxxxxxxxxxxx
 Resource Name FIlter: workspace_creds
 -------------------------------------
 
-Found 3 resources whose name(s) start with the keyword!:
+Found 3 resources whose name(s) start with the keyword:
 
     module.ws_vending_machine["djs-ec2"].aws_iam_access_key.workspace_creds
     module.ws_vending_machine["djs-iam"].aws_iam_access_key.workspace_creds
