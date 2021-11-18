@@ -3,7 +3,7 @@
 This script targets a TFC workspace and runs the equivalent of a `terraform apply -replace=[]` on a dynamic set of resources determined by a provided keyword
 
 ## Why?
-In certain TFC implementations, people will use a tightly controlled organization and workspace to create child organizations and workspaces. This is commonly referred to as the `workspace vending machine` approach.  In this model, the parent workspace is also responsible for managing the child's workspace credentials in the form of sensitive workspace variables.  Using this script, you can schedule the rotation of those credentials.  
+In certain TFC implementations, people will use a tightly controlled organization and workspace to create child organizations and workspaces. This is commonly referred to as the `workspace vending machine` approach.  In this model, the parent workspace is also responsible for managing the child workspace's credentials in the form of sensitive workspace variables.  Using this script, you can schedule the rotation of those credentials.  
 
 ## Usage
 1. Set an environment variable `TFC_TOKEN` equal to a valid TFC token with adequate permissions
