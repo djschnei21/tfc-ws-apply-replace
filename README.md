@@ -8,8 +8,11 @@ In certain TFC implementations, people will use a tightly controlled organizatio
 ## Usage
 1. Set an environment variable "TFC_TOKEN" equal to a valid TFC token with adequate permissions
 2. run `python3 rotate.py <org name> <workspace ID> <resource name filter>` where:
+
 `org name`: is the name of the org that contains your workspace
+
 `workspace ID`: is the ws-xxxxxxxxxxxxxxxx formatted ID of your target workspace
+
 `resource name filter`: is the beginning of the resource name string
 
 ## Example 
