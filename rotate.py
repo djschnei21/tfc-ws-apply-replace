@@ -63,7 +63,7 @@ if len(resources) > 0:
     run_id = replace(ws_id, resources, payload_tpl)
     status1 = run_status(run_id)
     status2 = status1
-    print("\nTriggering a \'terraform apply -replace=" + str(resources) + "\' to rotate the found resources...")
+    print("\nTriggering a \'terraform apply -replace=\' to rotate the found resources...")
     print("\nLink to run: " + tfc_url + "/app/" + org_name + "/workspaces/" + ws_name + "/runs/" + run_id)
     print("\nStatus: " + status1 + "...")
     while status1 != "applied" and status1 != "errored":
