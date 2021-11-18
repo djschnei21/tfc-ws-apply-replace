@@ -25,6 +25,6 @@ resource "aws_iam_access_key" "workspace_creds" {
   user = aws_iam_user.iam_user.name
 }
 ```
-If I wanted to replace/rotate the `aws_iam_access_key.workspace_creds`, I would use the resources name `workspace_creds`
+If I wanted to replace/rotate the resource `aws_iam_access_key`, I would use the resources given name `workspace_creds`
 
 `python3 rotate.py djs-admin ws-Zh2kBGmXrh5hgBxA workspace_creds`
