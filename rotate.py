@@ -1,3 +1,5 @@
+#!/usr/bin/python3 -u
+
 import os
 import sys
 import json
@@ -48,30 +50,30 @@ def run_status (run_id):
     status = api.runs.show(run_id)['data']['attributes']['status']
     return status
 
-print("-------------------------------------", flush=False)
-print("TFC Organization Name: " + org_name, flush=False)
-print("TFC Workspace ID: " + ws_id, flush=False)
-print("Resource Name FIlter: " + resource_name_keyword, flush=False)
-print("-------------------------------------\n", flush=False)
+print("-------------------------------------")
+print("TFC Organization Name: " + org_name)
+print("TFC Workspace ID: " + ws_id)
+print("Resource Name FIlter: " + resource_name_keyword)
+print("-------------------------------------\n")
 
 ws_name = workspace_name(ws_id)
 resources = find_resources(ws_id, resource_name_keyword)
 if len(resources) > 0:
-    print("Found " + str(len(resources)) + " resources whose name(s) contain the keyword!:\n", flush=False)
+    print("Found " + str(len(resources)) + " resources whose name(s) contain the keyword!:\n")
     for r in resources:
-        print("    " + r, flush=False)
+        print("    " + r)
     run_id = replace(ws_id, resources, payload_tpl)
     status1 = run_status(run_id)
     status2 = status1
-    print("\nTriggering a \'terraform apply -replace=" + str(resources) + "\' to rotate the found resources...", flush=False)
-    print("\nLink to run: " + tfc_url + "/app/" + org_name + "/workspaces/" + ws_name + "/runs/" + run_id, flush=False)
-    print("\nTFC Run Status: " + status1 + "...", flush=False)
+    print("\nTriggering a \'terraform apply -replace=" + str(resources) + "\' to rotate the found resources...")
+    print("\nLink to run: " + tfc_url + "/app/" + org_name + "/workspaces/" + ws_name + "/runs/" + run_id)
+    print("\nTFC Run Status: " + status1 + "...")
     while status1 != "applied" and status1 != "errored":
         time.sleep(1)
         status2 = run_status(run_id)
         if status1 != status2:
-            print("TFC Run Status: " + status2 + "...", flush=False)
+            print("TFC Run Status: " + status2 + "...")
             status1 = status2
     if status1 == "errored":
-        print("Looks like something went wrong... Please see logs above.", flush=False)
+        print("Looks like something went wrong... Please see logs above.")
         sys.exit(1)
