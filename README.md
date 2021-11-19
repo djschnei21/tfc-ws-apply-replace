@@ -1,4 +1,4 @@
-# tfc-ws-resource-replace
+# tfc-ws-apply-replace
 ## What does it do?
 This script targets a TFC workspace and runs the equivalent of a `terraform apply -replace=[]` on a dynamic set of resources determined by a provided keyword
 
