@@ -8,8 +8,7 @@ tfc_url = "https://app.terraform.io"
 api_token = os.getenv("TFC_TOKEN")
 
 if api_token == None:
-    print("\nPlease set TFC_TOKEN as an environment variable equal to a valid TFC token")
-    sys.exit(1)
+    sys.exit("\nPlease set TFC_TOKEN as an environment variable equal to a valid TFC token")
 
 org_name = sys.argv[1]
 ws_id = sys.argv[2]
@@ -23,10 +22,33 @@ api = TFC(api_token, url=tfc_url)
 api.set_org(org_name)
 
 def workspace_name (ws_id):
+    """Returns the workspace name.
+
+    Related Doc:
+        https://www.terraform.io/docs/cloud/api/workspaces.html#list-workspaces
+
+    Args:
+        ws_id (string): workspace ID can be found in the workspace settings
+
+    Returns:
+        string: name of the workspace
+    """
     name = api.workspaces.list(ws_id)['data'][0]['attributes']['name']
     return name
 
 def find_resources (ws_id, resource_name_keyword):
+    """Finds resources created in the root module and any child modules in the workspace.
+
+    Related Doc:
+        https://www.terraform.io/docs/cloud/api/state-versions.html#fetch-the-current-state-version-for-a-workspace
+
+    Args:
+        ws_id (string): workspace ID can be found in the workspace settings
+        resource_name_keyword (string): a keyword matching the beginning of the resource name(s) you are trying to find
+
+    Returns:
+        list: resource addresses whose names start with the resource_name_keyword
+    """
     resource_to_replace = list()
     state = api.state_versions.get_current(ws_id)
     for r in state['data']['attributes']['resources']:
@@ -39,12 +61,36 @@ def find_resources (ws_id, resource_name_keyword):
     return resource_to_replace
 
 def replace (ws_id, resources, payload):
+    """Generates the appropriate payload to trigger a run on the specified workspace replacing the listed resources addresses.
+
+    Related Doc:
+        https://www.terraform.io/docs/cloud/api/run.html#create-a-run
+
+    Args:
+        ws_id (string): workspace ID can be found in the workspace settings
+        resources (list): resource addresses you want to target with a replace
+        payload (json): a valid json object which will be used as the API payload template
+
+    Returns:
+        string: the triggered run ID
+    """
     payload['data']['attributes']['replace-addrs'] = resources
     payload['data']['relationships']['workspace']['data']['id'] = ws_id
     resp = api.runs.create(payload)['data']['id']
     return resp
 
 def run_status (run_id):
+    """[summary]
+
+    Related Doc:
+        https://www.terraform.io/docs/cloud/api/run.html#get-run-details
+
+    Args:
+        run_id (string): run ID who's status you want to retrieve
+
+    Returns:
+        string: status of the run
+    """
     status = api.runs.show(run_id)['data']['attributes']['status']
     return status
 
@@ -73,5 +119,4 @@ if len(resources) > 0:
             print("Status: " + status2 + "...")
             status1 = status2
     if status1 == "errored":
-        print("Looks like something went wrong... Please see logs above.")
-        sys.exit(1)
+        sys.exit("Looks like something went wrong... Please see logs above.")
